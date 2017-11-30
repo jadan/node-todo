@@ -96,3 +96,37 @@ describe('GET /todos/:id', () => {
       .end(done);
   });
 });
+
+
+describe('DELETE /todos/:id', ()=>{
+	it('should delete a todo doc', (done) =>{
+		request(app)
+		.delete(`/todos/${todos[0]._id.toHexString()}`)
+		.expect(200)
+		.end(done);
+	});
+
+	it('should return an error deleting', (done)=>{
+		var testID = new ObjectID().toHexString();
+		request(app)
+		.delete(`/todos/${testID}`)
+		.request(400)
+		.end(done);
+	});
+
+	it('should return an error deleting', (done)=>{
+		var testID = 123;
+		request(app)
+		.delete(`/todos/${testID}`)
+		.request(400)
+		.end(done);
+	});
+})
+
+
+
+
+
+
+
+

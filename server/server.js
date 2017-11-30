@@ -6,6 +6,7 @@ var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 var {ObjectID} = require('mongodb');
 
+var port = process.env.PORT || 3000;
 var app = express();
 //middleware
 app.use(bodyParser.json());
@@ -54,10 +55,26 @@ app.get('/todos/:id', (req, res)=>{
 	.catch((e)=>res.status(404).send(e));
 });
 
+//Remove specific task. 
+app.delete('/todos/:id',(req,res)=>{
+	var id = req.params.id;
+	if(!ObjectID.isValid(id)){
+		return res.status(400).send('Not found!');
+	}
+
+	Todo.findByIdAndRemove(id).then(
+		(doc)=>{
+			if(!doc){
+				return res.status(404).send();
+			}
+		res.send(doc);
+	})
+	.catch((e)=>res.status(404).send(e));
+});
 
 //Start app and add to exports (header file).
-app.listen(3000, () => {
-	console.log('Server started on port 3000.');
+app.listen(port, () => {
+	console.log(`Server started on port ${port}.`);
 });
 
 module.exports = {app};
