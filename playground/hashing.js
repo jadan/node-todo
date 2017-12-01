@@ -36,11 +36,11 @@ const bcrypt = require('bcryptjs');
 
 var password = '123abc!';
 // !rainbowTables
-// bcrypt.genSalt(10,(err,salt)=>{
-// 	bcrypt.hash(password, salt, (err, hash)=>{
-// 		console.log(hash);
-// 	});
-// });
+bcrypt.genSalt(10,(err,salt)=>{
+	bcrypt.hash(password, salt, (err, hash)=>{
+		console.log(hash);
+	});
+});
 
 var hashedPassword = '$2a$10$JBECKmPKokN6mk7zHWAZ9ekM6cDdPTJwd6AX8OfW21xP/BYNFnAvS';
 
