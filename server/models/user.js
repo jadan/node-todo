@@ -3,6 +3,12 @@ const validator = require('validator');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
+
+//mongoose middleware 
+//some code before a document is saved (hash password)
+
+
 
 //Using a Schema allows you to define methods.
 var UserSchema = new mongoose.Schema(
@@ -76,6 +82,23 @@ UserSchema.statics.findByToken = function (token) {
 	};
 };
 
+//UserSchema pre (middleware setup)
+UserSchema.pre('save', function(next) {
+	var user = this;
+	if(user.isModified('password')){
+		//hash
+		console.log('called hashing!');
+		bcrypt.genSalt(10,(err,salt)=>{
+			bcrypt.hash(user.password, salt, (err, hash)=>{
+				user.password = hash;
+				next();
+			});
+		});
+	}else{
+		console.log('did not call hashing...');
+		next();
+	}
+});
 
 
 
