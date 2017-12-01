@@ -23,9 +23,10 @@ app.use(bodyParser.json());
 //Define server methods.
 
 //Define input.
-app.post('/todos', (req,res)=>{
+app.post('/todos', authenticate, (req,res)=>{
 	var todo = new Todo({
-		text: req.body.text
+		text: req.body.text,
+		_creator: req.user._id
 	});
 	todo.save().then((doc)=>{
 		res.send(doc);
@@ -35,8 +36,10 @@ app.post('/todos', (req,res)=>{
 });
 
 //Define output.
-app.get('/todos', (req,res)=>{
-	Todo.find().then(
+app.get('/todos', authenticate, (req,res)=>{
+	Todo.find({
+		_creator: req.user._id
+	}).then(
 		(todos)=>{
 			res.send({todos});
 		}, 
@@ -46,14 +49,14 @@ app.get('/todos', (req,res)=>{
 });
 
 //Get specific task.
-app.get('/todos/:id', (req, res)=>{
+app.get('/todos/:id', authenticate, (req, res)=>{
 	var id = req.params.id;
 
 	if(!ObjectID.isValid(id)){
 		return res.status(400).send('Not found!');
 	}
 
-	Todo.findById(id).then(
+	Todo.findOne({_id:id, _creator: req.user._id}).then(
 		(todo)=>{
 			if(!todo){
 				return res.status(404).send();
@@ -64,13 +67,13 @@ app.get('/todos/:id', (req, res)=>{
 });
 
 //Remove specific task. 
-app.delete('/todos/:id',(req,res)=>{
+app.delete('/todos/:id', authenticate, (req,res)=>{
 	var id = req.params.id;
 	if(!ObjectID.isValid(id)){
 		return res.status(400).send('Not found!');
 	}
 
-	Todo.findByIdAndRemove(id).then(
+	Todo.findOneAndRemove({_id:id, _creator: req.user._id}).then(
 		(todo)=>{
 			if(!todo){
 				return res.status(404).send();
