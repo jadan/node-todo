@@ -76,7 +76,7 @@ describe('GET /todos/:id', () => {
       .get(`/todos/${todos[0]._id.toHexString()}`)
       .expect(200)
       .expect((res) => {
-        expect(res.body.text).toBe(todos[0].text);
+        expect(res.body.todo.text).toBe(todos[0].text);
       })
       .end(done);
   });
@@ -103,6 +103,9 @@ describe('DELETE /todos/:id', ()=>{
 		request(app)
 		.delete(`/todos/${todos[0]._id.toHexString()}`)
 		.expect(200)
+		.expect((res) => {
+        expect(res.body.todo.text).toBe(todos[0].text);
+      	})
 		.end(done);
 	});
 

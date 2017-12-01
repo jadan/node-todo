@@ -1,5 +1,9 @@
-var express = require('express');
-var bodyParser = require('body-parser');
+require('./config');
+
+
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
@@ -46,11 +50,11 @@ app.get('/todos/:id', (req, res)=>{
 	}
 
 	Todo.findById(id).then(
-		(doc)=>{
-			if(!doc){
+		(todo)=>{
+			if(!todo){
 				return res.status(404).send();
 			}
-			res.send(doc);
+			res.send({todo});
 		})
 	.catch((e)=>res.status(404).send(e));
 });
@@ -63,13 +67,41 @@ app.delete('/todos/:id',(req,res)=>{
 	}
 
 	Todo.findByIdAndRemove(id).then(
-		(doc)=>{
-			if(!doc){
+		(todo)=>{
+			if(!todo){
 				return res.status(404).send();
 			}
-		res.send(doc);
+		res.send({todo});
 	})
 	.catch((e)=>res.status(404).send(e));
+});
+
+
+//Patch code (update)
+app.patch('/todos/:id', (req,res)=>{
+	var id = req.params.id;
+	//app security via lodash.pick (can't edit some properties)
+	var body = _.pick(req.body, ['text', 'completed']);
+
+	if(!ObjectID.isValid(id)){
+		return res.status(400).send('Not found!');
+	}
+
+	if(_.isBoolean(body.completed) && body.completed){
+		//update
+		body.completedAt = new Date().getTime();
+	}else{
+		body.completed = false;
+		body.completedAt = null;
+		console.log('here');
+	}
+
+	Todo.findByIdAndUpdate(id,{$set:body}, {new: true}).then((todo)=>{
+		if(!todo){
+			return res.status(400).send();
+		}
+		res.send({todo});
+	}).catch((e)=>res.status(400).send());
 });
 
 //Start app and add to exports (header file).
