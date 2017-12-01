@@ -85,7 +85,7 @@ app.delete('/todos/:id', authenticate, (req,res)=>{
 
 
 //Patch code (update)
-app.patch('/todos/:id', (req,res)=>{
+app.patch('/todos/:id', authenticate, (req,res)=>{
 	var id = req.params.id;
 	//app security via lodash.pick (can't edit some properties)
 	var body = _.pick(req.body, ['text', 'completed']);
@@ -103,7 +103,7 @@ app.patch('/todos/:id', (req,res)=>{
 		console.log('here');
 	}
 
-	Todo.findByIdAndUpdate(id,{$set:body}, {new: true}).then((todo)=>{
+	Todo.findOneAndUpdate({_id:id, _creator:req.user._id},{$set:body}, {new: true}).then((todo)=>{
 		if(!todo){
 			return res.status(400).send();
 		}
