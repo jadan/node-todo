@@ -62,6 +62,18 @@ UserSchema.methods.toJSON = function () {
 	return _.pick(user, ['_id', 'email']);
 };
 
+UserSchema.methods.removeToken = function (token) {
+	var user = this; 
+//remove items from an array  that match criteria
+	return user.update({
+		$pull:{
+			tokens: {
+				token: token
+			}
+		}
+	});
+};
+
 
 //Model method. 
 UserSchema.statics.findByToken = function (token) {
